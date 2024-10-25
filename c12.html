@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic To-Do List</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #2e004f; /* Темно-фіолетовий фон */
+      margin: 0;
+    }
+
+    .container {
+      background-color: #6a0dad; /* Насичений фіолетовий */
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      width: 350px;
+      text-align: center;
+      color: white;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2em;
+      text-shadow: 0 0 10px white;
+    }
+
+    .input-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    input {
+      width: 75%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #ff00ff; /* Яскраво-рожевий для контрасту */
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px white;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ff66ff;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      background-color: #bf40bf; /* Блідо-фіолетовий для елементів списку */
+      padding: 10px;
+      margin: 10px 0;
+      border: 2px solid white;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      animation: fadeIn 0.5s ease; /* Анімація появи */
+    }
+
+    li button {
+      background-color: #ff00ff;
+      border: none;
+      padding: 5px;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.8em;
+    }
+
+    li button:hover {
+      background-color: #ff66ff;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes glow {
+      0% {
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 30px rgba(255, 0, 255, 1);
+      }
+      100% {
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.5);
+      }
+    }
+
+    button, input {
+      animation: glow 1s infinite alternate;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>To-Do List</h1>
+    <div class="input-container">
+      <input type="text" id="todo-input" placeholder="Add a new task">
+      <button id="add-btn">Add</button>
+    </div>
+    <ul id="todo-list"></ul>
+  </div>
+
+  <script>
+    // Elements
+    const todoInput = document.getElementById('todo-input');
+    const addBtn = document.getElementById('add-btn');
+    const todoList = document.getElementById('todo-list');
+
+    // Load saved todos from localStorage on page load
+    document.addEventListener('DOMContentLoaded', loadTodos);
+
+    // Add button event
+    addBtn.addEventListener('click', addTodo);
+
+    // Add new todo
+    function addTodo() {
+      const todoText = todoInput.value.trim();
+      if (todoText !== '') {
+        const li = createTodoElement(todoText);
+        todoList.appendChild(li);
+        saveTodoToLocal(todoText);
+        todoInput.value = '';
+      }
+    }
+
+    // Create list item for a new todo
+    function createTodoElement(text) {
+      const li = document.createElement('li');
+      li.textContent = text;
+
+      // Delete button
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.addEventListener('click', () => {
+        li.remove();
+        deleteTodoFromLocal(text);
+      });
+
+      li.appendChild(deleteBtn);
+      return li;
+    }
+
+    // Save todo to localStorage
+    function saveTodoToLocal(todo) {
+      let todos = getTodosFromLocal();
+      todos.push(todo);
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+
+    // Get todos from localStorage
+    function getTodosFromLocal() {
+      const todos = localStorage.getItem('todos');
+      return todos ? JSON.parse(todos) : [];
+    }
+
+    // Load todos from localStorage and display
+    function loadTodos() {
+      const todos = getTodosFromLocal();
+      todos.forEach(todo => {
+        const li = createTodoElement(todo);
+        todoList.appendChild(li);
+      });
+    }
+
+    // Delete todo from localStorage
+    function deleteTodoFromLocal(todo) {
+      let todos = getTodosFromLocal();
+      todos = todos.filter(item => item !== todo);
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+  </script>
+</body>
+</html>
